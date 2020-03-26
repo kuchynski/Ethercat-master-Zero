@@ -1,0 +1,32 @@
+//
+// Ethercat master Zero
+// kuchynskiandrei@gmail.com
+// 2020
+//
+
+#ifndef cmodule_H
+#define cmodule_H
+
+#include "CScheduler.hpp"
+
+class CScheduler;
+
+class CModule
+{
+public:
+	CModule(CScheduler *set_scheduler);
+    ~CModule();
+
+    void RunTx(uint64_t tim_us);
+    void RunRx(CDatagram *datagram);
+    unsigned char GetIndex() const { return index; }
+
+private:
+    unsigned char index;
+    CScheduler *scheduler;
+    CDatagram *datagram0;
+    CDatagram *datagram1;
+};
+
+#endif
+                      

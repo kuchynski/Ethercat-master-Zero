@@ -1,0 +1,48 @@
+#include <iostream>
+#include <string.h>
+#include "CModule.hpp"
+#include "CScheduler.hpp"
+
+using namespace std;
+
+//---------------------------------------------
+CModule::CModule(CScheduler *set_scheduler) : scheduler(set_scheduler)
+{
+    struct SDatagramParam datagram_param;
+    index = scheduler->GetNewModuleIndex();
+    datagram_param.index = index;
+    datagram_param.size_data = 2;
+    datagram_param.priority = 1;
+    datagram0 = new CDatagram(datagram_param);
+
+    datagram_param.priority = 2;
+    datagram1 = new CDatagram(datagram_param);
+}
+
+//---------------------------------------------
+CModule::~CModule()
+{
+    delete datagram0;
+}
+
+//---------------------------------------------
+void CModule::RunTx(uint64_t tim_us)
+{
+    scheduler->AddTxDatagram(datagram0);
+    scheduler->AddTxDatagram(datagram1);
+}
+
+//---------------------------------------------
+void CModule::RunRx(CDatagram *datagram)
+{
+    unsigned char datagram_index = datagram->GetIndex();
+    //unsigned int size_data = datagram->GetSize();
+    cout << "module " << (int)index << " rx: " << (int)datagram_index << endl;
+
+        // Parse a datagram here
+
+    delete datagram;
+}
+
+//---------------------------------------------
+//---------------------------------------------
