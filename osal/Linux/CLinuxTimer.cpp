@@ -17,9 +17,9 @@ CLinuxTimer::CLinuxTimer(uint64_t p): CTimer(GetTimeUs(), p)
 uint64_t CLinuxTimer::GetTimeUs()
 {
     struct timespec linux_time;
-    
+
     clock_gettime(CLOCK_REALTIME, &linux_time);
-	return linux_time.tv_sec * 1000000ULL + linux_time.tv_nsec / 1000;
+    return linux_time.tv_sec * 1000000ULL + linux_time.tv_nsec / 1000;
 }
 
 //---------------------------------------------

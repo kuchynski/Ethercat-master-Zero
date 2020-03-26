@@ -14,7 +14,7 @@ class CScheduler;
 class CModule
 {
 public:
-	CModule(CScheduler *set_scheduler);
+    CModule(CScheduler *set_scheduler);
     ~CModule();
 
     void RunTx(uint64_t tim_us);

@@ -12,13 +12,12 @@
 class CLinuxTimer: public CTimer
 {
 public:
-       CLinuxTimer(uint64_t p = 0);
-       ~CLinuxTimer() {}
+    CLinuxTimer(uint64_t p = 0);
+    ~CLinuxTimer() {}
 
-       uint64_t GetTimeUs();
+    uint64_t GetTimeUs();
 private:
-       void SleepUntilUs(uint64_t awake_time);
+    void SleepUntilUs(uint64_t awake_time);
 };
 
 #endif
-                      

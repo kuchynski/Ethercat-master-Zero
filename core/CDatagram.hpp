@@ -21,8 +21,8 @@ struct SDatagramParam
 class CDatagram
 {
 public:
-	CDatagram(struct SDatagramParam &set_param);    // tx datagram
-	CDatagram(unsigned char *buf, int size_buffer); // rx datagram
+    CDatagram(struct SDatagramParam &set_param);    // tx datagram
+    CDatagram(unsigned char *buf, int size_buffer); // rx datagram
     ~CDatagram();
 
     unsigned int SetIntoBuffer(unsigned char *out_buf, bool more_datargam);

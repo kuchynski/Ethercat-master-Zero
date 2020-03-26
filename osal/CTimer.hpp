@@ -10,7 +10,7 @@
 class CTimer
 {
 public:
-	CTimer(uint64_t set_current_time, uint64_t set_period);
+    CTimer(uint64_t set_current_time, uint64_t set_period);
     virtual ~CTimer() {};
 
     virtual uint64_t GetTimeUs() = 0;

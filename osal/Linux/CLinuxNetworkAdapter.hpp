@@ -19,7 +19,7 @@
 class CLinuxNetworkAdapter : public CNetworkAdapter
 {
 public:
-	CLinuxNetworkAdapter(const char *name);
+    CLinuxNetworkAdapter(const char *name);
     ~CLinuxNetworkAdapter();
 
     bool Send(unsigned char *buf, unsigned int size);

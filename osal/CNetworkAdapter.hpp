@@ -15,7 +15,7 @@
 class CNetworkAdapter
 {
 public:
-	CNetworkAdapter();
+    CNetworkAdapter();
     ~CNetworkAdapter();
 
     unsigned char* GetBufferToSend();

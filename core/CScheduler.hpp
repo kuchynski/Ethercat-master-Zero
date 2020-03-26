@@ -17,7 +17,7 @@ class CModule;
 class CScheduler
 {
 public:
-	CScheduler(CTimer *set_timer, CNetworkAdapter *set_adapter);
+    CScheduler(CTimer *set_timer, CNetworkAdapter *set_adapter);
     ~CScheduler();
 
     void AddModule(CModule *new_module);

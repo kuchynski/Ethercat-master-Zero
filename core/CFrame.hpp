@@ -17,7 +17,7 @@
 class CFrame
 {
 public:
-	CFrame();
+    CFrame();
     CFrame(const CFrame &fr);
     CFrame(unsigned char *recieve_buf, int recieve_size);
     ~CFrame();
