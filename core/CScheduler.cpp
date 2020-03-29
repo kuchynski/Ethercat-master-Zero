@@ -24,7 +24,7 @@ CScheduler::~CScheduler()
 //---------------------------------------------
 void CScheduler::Run()
 {
-    int count = 10;
+    int count = 10000;
     unsigned char recieve_buf[MAX_FRAME_SIZE];
     uint64_t current_cycle_time = timer->GetTimeUs();
 
@@ -47,7 +47,7 @@ void CScheduler::Run()
         // Recieve
         int recieve_size;
         while((recieve_size = adapter->Receive(recieve_buf)) > 0) {
-            //if(recieve_size > 0) for(int j = 0; j < recieve_size; j ++) cout << hex << ((int)recieve_buf[j]) << " "; cout << endl;
+//            for(int j = 0; j < recieve_size; j ++) cout << hex << ((int)recieve_buf[j]) << " "; cout << endl;
             CFrame frame_rx(recieve_buf, recieve_size);
             SendDatagramBack(frame_rx);
         }

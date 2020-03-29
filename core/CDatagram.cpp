@@ -28,15 +28,14 @@ CDatagram::CDatagram(struct SDatagramParam &set_param) :
     buffer = new unsigned char[size_buffer];
     memset(buffer, 0, size_buffer);
 
-    buffer[OFFSET_CMD] = 0x07;
+    buffer[OFFSET_CMD] = param.command;
     buffer[OFFSET_IDX] = param.index;
-    buffer[OFFSET_ADDRESS+0] = 0x01;
-    buffer[OFFSET_ADDRESS+1] = 0x02;
-    buffer[OFFSET_ADDRESS+2] = 0x03;
-    buffer[OFFSET_ADDRESS+3] = 0x04;
+    buffer[OFFSET_ADDRESS+0] = param.address;
+    buffer[OFFSET_ADDRESS+1] = param.address >> 8;
+    buffer[OFFSET_ADDRESS+2] = param.address >> 16;
+    buffer[OFFSET_ADDRESS+3] = param.address >> 24;
     buffer[OFFSET_SIZE+0] = param.size_data;
     buffer[OFFSET_SIZE+1] = param.size_data >> 8;
-    buffer[OFFSET_DATA] = param.priority;
 }
 
 //---------------------------------------------
@@ -44,6 +43,15 @@ CDatagram::CDatagram(unsigned char *buf, int size_buffer)
 {
     buffer = new unsigned char[size_buffer];
     memcpy(buffer, buf, size_buffer);
+
+    param.command = buffer[OFFSET_CMD];
+    param.index = buffer[OFFSET_IDX];
+    param.address = buffer[OFFSET_ADDRESS+0];
+    param.address += ((unsigned int)buffer[OFFSET_ADDRESS+1] << 8);
+    param.address += ((unsigned int)buffer[OFFSET_ADDRESS+2] << 16);
+    param.address += ((unsigned int)buffer[OFFSET_ADDRESS+3] << 24);
+    param.size_data = buffer[OFFSET_SIZE+0];
+    param.size_data += ((unsigned int)buffer[OFFSET_SIZE+1] << 8);
 }
 
 //---------------------------------------------

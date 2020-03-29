@@ -14,38 +14,53 @@ using namespace std;
 //---------------------------------------------
 CModule::CModule(CScheduler *set_scheduler) : scheduler(set_scheduler)
 {
-    struct SDatagramParam datagram_param;
     index = scheduler->GetNewModuleIndex();
-    datagram_param.index = index;
-    datagram_param.size_data = 2;
-    datagram_param.priority = 1;
-    datagram0 = new CDatagram(datagram_param);
-
-    datagram_param.priority = 2;
-    datagram1 = new CDatagram(datagram_param);
 }
 
 //---------------------------------------------
 CModule::~CModule()
 {
-    delete datagram0;
+/*    while(datagrams.GetSize()) {
+        CDatagram *datagram;
+        datagrams >> datagram;
+        delete datagram;
+    }*/
 }
 
 //---------------------------------------------
-void CModule::RunTx(uint64_t tim_us)
+void CModule::InsertDatagram(CDatagram *set_datagram)
 {
-    scheduler->AddTxDatagram(datagram0);
-    scheduler->AddTxDatagram(datagram1);
+    datagrams << set_datagram;
+}
+
+//---------------------------------------------
+void CModule::RemoveDatagram(CDatagram *datagram_to_remove)
+{
+    for(int i = 0; i < datagrams.GetSize(); i ++) {
+        if(datagrams[i] == datagram_to_remove) {
+            datagrams.Erase(i);
+            break;
+        }
+    }
+}
+
+//---------------------------------------------
+void CModule::RunTx(uint64_t time_us)
+{
+    StateMachine(time_us);
+
+    for(int i = 0; i < datagrams.GetSize(); i ++)
+        scheduler->AddTxDatagram(datagrams[i]);
+
+    datagrams.Clear();
 }
 
 //---------------------------------------------
 void CModule::RunRx(CDatagram *datagram)
 {
-    unsigned char datagram_index = datagram->GetIndex();
+//    unsigned char datagram_index = datagram->GetIndex();
     //unsigned int size_data = datagram->GetSize();
-    cout << "module " << (int)index << " rx: " << (int)datagram_index << endl;
-
-        // Parse a datagram here
+//    cout << "module " << (int)index << " rx: " << (int)datagram_index << endl;
 
     delete datagram;
 }

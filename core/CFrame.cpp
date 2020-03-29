@@ -35,18 +35,15 @@ CFrame::CFrame(unsigned char *recieve_buf, int recieve_size)
     if(recieve_size >= MIN_FRAME_SIZE) {
         if(recieve_buf[ETHERNET_HEADER_START+12] != 0x88 || recieve_buf[ETHERNET_HEADER_START+12] != 0xA4) {
             int frame_size = recieve_buf[ETHERCAT_HEADER_START+0] + ((recieve_buf[ETHERCAT_HEADER_START+1] & 0x07) << 8);
+            //for(int j = 0; j < recieve_size; j ++) cout << hex << ((int)recieve_buf[j]) << " "; cout << endl;
 //cout << frame_size << " frame_size, ";
             unsigned char *datagram_buf = recieve_buf + DATAGRAM_START;
             while(frame_size >= MIN_DATAGRAM_SIZE) {
-                struct SDatagramParam datagram_param;
-                datagram_param.index = datagram_buf[1];
                 int datagram_data_size = datagram_buf[6] + ((datagram_buf[7] & 0x07) << 8);
-                datagram_param.size_data = datagram_data_size;
                 int datagram_size = datagram_data_size + DATAGRAM_HEADER_SIZE + DATAGRAM_WC_SIZE;
 //cout << datagram_size << " datagram_size" << endl;
                 bool more_datagram = datagram_buf[7] & 0x80;
                 CDatagram *datagram = new CDatagram(datagram_buf, datagram_size);
-                datagram->SetParam(datagram_param);
 
                 p_datagrams << datagram;
 
