@@ -23,7 +23,7 @@ using namespace std;
 #define MIN_DATAGRAM_SIZE       (DATAGRAM_HEADER_SIZE + DATAGRAM_WC_SIZE)
 
 //---------------------------------------------
-CFrame::CFrame() //: buffer(NULL)
+CFrame::CFrame()
 {
 }
 
@@ -31,11 +31,10 @@ CFrame::CFrame() //: buffer(NULL)
 CFrame::CFrame(unsigned char *recieve_buf, int recieve_size)
 {
     // parsing the frame
-//cout << "parse: ";
     if(recieve_size >= MIN_FRAME_SIZE) {
-        if(recieve_buf[ETHERNET_HEADER_START+12] != 0x88 || recieve_buf[ETHERNET_HEADER_START+12] != 0xA4) {
+        if(recieve_buf[ETHERNET_HEADER_START+12] == 0x88 && recieve_buf[ETHERNET_HEADER_START+13] == 0xA4) {
             int frame_size = recieve_buf[ETHERCAT_HEADER_START+0] + ((recieve_buf[ETHERCAT_HEADER_START+1] & 0x07) << 8);
-            //for(int j = 0; j < recieve_size; j ++) cout << hex << ((int)recieve_buf[j]) << " "; cout << endl;
+//            for(int j = 0; j < recieve_size; j ++) cout << hex << ((int)recieve_buf[j]) << " "; cout << endl;
 //cout << frame_size << " frame_size, ";
             unsigned char *datagram_buf = recieve_buf + DATAGRAM_START;
             while(frame_size >= MIN_DATAGRAM_SIZE) {
@@ -83,7 +82,7 @@ CFrame& CFrame::operator>>(CDatagram **p_new_datagram)
 {
     //cout << "f0 " << p_new_datagram << endl;
     p_datagrams >> *p_new_datagram;
-    //cout << "f1 " << p_new_datagram << endl;
+//cout << "f1 " << p_new_datagram << endl;
     return *this;
 }
 
@@ -97,10 +96,6 @@ CFrame::~CFrame()
 void CFrame::Clear()
 {
     p_datagrams.Clear();
-   // if(buffer) {
-     //   delete [] buffer;
-       // buffer = 0;
-    //}
 }
 
 //---------------------------------------------

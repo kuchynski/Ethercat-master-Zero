@@ -10,6 +10,7 @@
 
 using namespace std;
 
+#define MAX_DATAGRAM_SIZE   1500
 #define HEADER_SIZE     10
 #define WC_SIZE         2
 #define OFFSET_CMD      0
@@ -21,56 +22,79 @@ using namespace std;
 #define OFFSET_DATA     10
 
 //---------------------------------------------
-CDatagram::CDatagram(struct SDatagramParam &set_param) :
-    param(set_param)
+CDatagram::CDatagram(const uint8_t set_index) : index(set_index) // tx datagram
 {
-    size_buffer = HEADER_SIZE + WC_SIZE + param.size_data; 
-    buffer = new unsigned char[size_buffer];
-    memset(buffer, 0, size_buffer);
-
-    buffer[OFFSET_CMD] = param.command;
-    buffer[OFFSET_IDX] = param.index;
-    buffer[OFFSET_ADDRESS+0] = param.address;
-    buffer[OFFSET_ADDRESS+1] = param.address >> 8;
-    buffer[OFFSET_ADDRESS+2] = param.address >> 16;
-    buffer[OFFSET_ADDRESS+3] = param.address >> 24;
-    buffer[OFFSET_SIZE+0] = param.size_data;
-    buffer[OFFSET_SIZE+1] = param.size_data >> 8;
+    struct SDatagramParam param;
+    param.index = index;
+    param.command = 0;
+    param.size_data = 0;
+    param.priority = 0;
+    param.address = 0;
+    SetParam(param);
 }
 
 //---------------------------------------------
-CDatagram::CDatagram(unsigned char *buf, int size_buffer)
+CDatagram::CDatagram(struct SDatagramParam &param) // tx datagram
 {
-    buffer = new unsigned char[size_buffer];
-    memcpy(buffer, buf, size_buffer);
-
-    param.command = buffer[OFFSET_CMD];
-    param.index = buffer[OFFSET_IDX];
-    param.address = buffer[OFFSET_ADDRESS+0];
-    param.address += ((unsigned int)buffer[OFFSET_ADDRESS+1] << 8);
-    param.address += ((unsigned int)buffer[OFFSET_ADDRESS+2] << 16);
-    param.address += ((unsigned int)buffer[OFFSET_ADDRESS+3] << 24);
-    param.size_data = buffer[OFFSET_SIZE+0];
-    param.size_data += ((unsigned int)buffer[OFFSET_SIZE+1] << 8);
+    index = param.index;
+    SetParam(param);
 }
 
 //---------------------------------------------
-CDatagram::~CDatagram()
-{
-    delete [] buffer;
+CDatagram::CDatagram(unsigned char *buf, int size_buffer) // rx datagram
+{    
+    command = buf[OFFSET_CMD];
+    index = buf[OFFSET_IDX];
+    memcpy(&address, buf + OFFSET_ADDRESS, sizeof(uint32_t));
+    memcpy(&size_data, buf + OFFSET_SIZE, sizeof(uint16_t));
+    size_data &= 0x07FF;
+    memcpy(buffer, buf + HEADER_SIZE, size_data);
+    wc = buf[size_buffer-2];
+    wc += ((uint16_t)buf[size_buffer-1] << 8);
+//cout << "rx: " << (int)command << " " << (int)index << " " << (int)address << " " << (int)size_data << " " << (int)wc << endl;
 }
 
 //---------------------------------------------
-void CDatagram::SetParam(struct SDatagramParam &set_param)
+void CDatagram::SetParam(struct SDatagramParam &param)
 {
-    param = set_param;
+    command = param.command;
+    address = param.address;
+    size_data = param.size_data;
 }
 
 //---------------------------------------------
 unsigned int CDatagram::SetIntoBuffer(unsigned char *out_buf, bool more_datargam)
 {
-    memcpy(out_buf, buffer, size_buffer);
+    const unsigned int size_buffer = HEADER_SIZE + WC_SIZE + size_data;
+
+    out_buf[OFFSET_CMD] = command;
+    out_buf[OFFSET_IDX] = index;
+    memcpy(out_buf + OFFSET_ADDRESS, &address, sizeof(uint32_t));
+    memcpy(out_buf + OFFSET_SIZE, &size_data, sizeof(uint16_t));
+
+    memcpy(out_buf + HEADER_SIZE, buffer, size_data);
     if(more_datargam)
         out_buf[OFFSET_MORE_DATAGRAM] |= 0x80;
+    
+    out_buf[OFFSET_IRQ+0] = 0;
+    out_buf[OFFSET_IRQ+1] = 0;
+    out_buf[size_buffer-1] = 0;
+    out_buf[size_buffer-2] = 0;
+
     return size_buffer;
 }
+
+//---------------------------------------------
+void CDatagram::GetData(unsigned char *out_buffer) const
+{
+    memcpy(out_buffer, buffer, size_data);
+}
+
+//---------------------------------------------
+void CDatagram::SetData(const unsigned char *in_buffer)
+{
+    memcpy(buffer, in_buffer, size_data);
+}
+
+//---------------------------------------------
+//---------------------------------------------

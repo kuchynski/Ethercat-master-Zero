@@ -32,7 +32,7 @@ void CScheduler::Run()
     {        
         // Work
         for(int i = 0; i < modules.GetSize(); i ++) {
-            modules[i]->RunTx(current_cycle_time);
+            modules[i]->RunTx(this, current_cycle_time);
         }
 
         // Wait

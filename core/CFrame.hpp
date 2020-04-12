@@ -31,7 +31,6 @@ public:
 
 private:
     CStack <CDatagram*> p_datagrams;
-    //unsigned char *buffer;
 
     unsigned int Gather(unsigned char *buffer);
 };

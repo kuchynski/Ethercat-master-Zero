@@ -12,26 +12,23 @@
 #define SCAN_BUS_MAX_NUMBER_DATAGRAM    4
 #define SCAN_BUS_PERIOD_US              1000000
 
-enum eState {esZero, esStart, esSend, esWait};
-enum eWaitType {ewtNone, ewtSlaveCount};
+enum eState {esZero = 0, esSCount, esSMemory, esSMemory1, esSMemory2, esSMemory3, esSEeprom, esSPrint, esError};
 
 class CModuleScanBus : public CModule
 {
 public:
-	CModuleScanBus(CScheduler *set_scheduler);
+	CModuleScanBus(unsigned char set_index);
     ~CModuleScanBus();
 
     void RunRx(CDatagram *datagram);
 
 private:
-    unsigned char state;
     uint64_t time_start;
-    uint64_t timeout;
-    eWaitType wait_type;
-    unsigned int slave_count;
-    CDatagram *datagram[SCAN_BUS_MAX_NUMBER_DATAGRAM];
+    unsigned int slave_number;
+    unsigned int eeprom_address;
 
-    void StateMachine(uint64_t time_us);
+    void StateMachine(const uint64_t time_us);
+    int ReadSlavesEeprom(const uint64_t time_us);
 };
 
 #endif

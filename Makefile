@@ -4,9 +4,11 @@ INCLUDE_DIRS =	-I./core \
 				-I./osal/Linux
 SRC_FILES = ./main.cpp \
 			./core/CScheduler.cpp \
-			./core/CModule.cpp \
+			./core/CSlave.cpp \
 			./core/CDatagram.cpp \
 			./core/CFrame.cpp \
+			./core/CModule.cpp \
+			./core/CModuleScanBus.cpp \
 			\
 			./osal/CTimer.cpp \
 			./osal/CNetworkAdapter.cpp \

@@ -13,34 +13,46 @@
 using namespace std;
 
 #define MAX_DATAGRAM_PRIORITY   4
+#define MAX_DATAGRAM_DATA_SIZE  1486
 
 struct SDatagramParam
 {
-    unsigned char index;
-    unsigned char command;
-    unsigned int size_data;
     unsigned int priority;
-    unsigned int address;
+
+    uint8_t command;
+    uint8_t index;
+    uint16_t size_data;
+    uint32_t address;
 };
 
 class CDatagram
 {
 public:
-    CDatagram(struct SDatagramParam &set_param);    // tx datagram
+    CDatagram(const uint8_t set_index);    // tx datagram
+    CDatagram(struct SDatagramParam &param);    // tx datagram
     CDatagram(unsigned char *buf, int size_buffer); // rx datagram
-    ~CDatagram();
+    ~CDatagram() {};
 
-    void SetParam(struct SDatagramParam &set_param);
+    void SetParam(struct SDatagramParam &param);
     unsigned int SetIntoBuffer(unsigned char *out_buf, bool more_datargam);
-    unsigned char GetIndex() { return param.index; }
-    unsigned int GetPriority() { return param.priority; }
-    unsigned char GetCommand() const { return param.command; }
-    unsigned int GetAddress() const { return param.address; }
+
+    unsigned int GetPriority() const { return priority; }
+    uint8_t GetCommand() const { return command; }
+    uint8_t GetIndex() const { return index; }
+    uint32_t GetAddress() const { return address; }
+    void GetData(unsigned char *out_buffer) const;
+    void SetData(const unsigned char *in_buffer);
 
 private:
-    unsigned char *buffer;
-    unsigned int size_buffer;
-    struct SDatagramParam param;
+    unsigned int priority;
+
+    uint8_t command;
+    uint8_t index;
+    uint32_t address;
+    uint16_t size_data;
+    uint16_t irq;
+    unsigned char buffer[MAX_DATAGRAM_DATA_SIZE];
+    uint16_t wc;
 };
 
 #endif
