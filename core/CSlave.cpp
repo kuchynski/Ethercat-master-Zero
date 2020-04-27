@@ -97,6 +97,7 @@ void CSlave::UploadMemoryStep1(CDatagram *datagram, const unsigned int address, 
     param.command = 1; // APRD
     param.size_data = size;
     param.address = address;
+    param.priority = 2;
 
     datagram->SetParam(param);
 }
@@ -119,6 +120,7 @@ void CSlave::DownloadMemoryStep(CDatagram *datagram, const unsigned int address,
     param.command = 2; // APWD
     param.size_data = size;
     param.address = address;
+    param.priority = 2;
 
     datagram->SetParam(param);
     datagram->SetData(data);

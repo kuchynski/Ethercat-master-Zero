@@ -7,6 +7,8 @@
 #ifndef cmodule_H
 #define cmodule_H
 
+#include <list>
+#include <vector>
 #include "CScheduler.hpp"
 #include "CSlave.hpp"
 
@@ -28,9 +30,10 @@ public:
 
 protected:
     unsigned char index;
-    CStack <CDatagram*> working_datagrams;
+    vector<CDatagram*> permanent_datagrams;
+    unsigned int slave_number;
     eWaitType wait_type;
-    CStack <CSlave> slaves;
+    vector<CSlave> slaves;
     unsigned char state;
     unsigned int state_count;
     unsigned int state_subcount;
@@ -43,6 +46,7 @@ protected:
     void SetTimeout(const uint64_t set_timeout) { timeout = set_timeout; }
 
     int ReadAllSlavesMemoryInTurn(const uint64_t time_us, const unsigned int address, const unsigned int size);    
+    int ReadAllSlavesMemoryAtOnce(const uint64_t time_us, const unsigned int address, const unsigned int size);    
     void ReadSlaveMemorySend(CDatagram *dg, const uint64_t time_us, const unsigned int address, const unsigned int size);
 
     int WriteAllSlavesMemoryInTurn(const uint64_t time_us, const unsigned int address, const unsigned int size, const uint8_t *data = NULL);
@@ -50,7 +54,7 @@ protected:
     void WriteSlaveMemory(CDatagram *dg, const uint64_t time_us, const unsigned int address, const unsigned int size);
 
 private:
-    CStack <CDatagram*> tx_datagrams;
+    list<CDatagram*> tx_datagrams;
     uint64_t timeout;
     unsigned int max_number_datagram;
     unsigned int active_slave_number;

@@ -24,7 +24,6 @@ public:
 
 private:
     uint64_t time_start;
-    unsigned int slave_number;
     unsigned int eeprom_address;
 
     void StateMachine(const uint64_t time_us);

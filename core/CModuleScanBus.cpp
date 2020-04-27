@@ -23,7 +23,7 @@ CModuleScanBus::CModuleScanBus(unsigned char set_index) :
     param.priority = 2;
     param.address = 0;
 
-    working_datagrams[0]->SetParam(param);
+    permanent_datagrams[0]->SetParam(param);
 
     state = esZero;
 }
@@ -66,16 +66,16 @@ void CModuleScanBus::StateMachine(const uint64_t time_us)
             state_count = 1;
             wait_type = ewtCustom0;
             SetTimeout(time_us);
-            InsertTxDatagram(working_datagrams[0]);
+            InsertTxDatagram(permanent_datagrams[0]);
         }
         else {
             ret = WaitRXDatagram(time_us);
             if(ret > 0) {
-                slaves.Clear();
+                slaves.clear();
                 for(int i = 0; i < slave_number; i ++)
-                    slaves << CSlave();
+                    slaves.push_back(CSlave());
             }
-            ChangeState(ret, slaves.GetSize()? esSMemory : esError, esError);
+            ChangeState(ret, slaves.size()? esSMemory : esError, esError);
         }
         break;
 
@@ -94,19 +94,19 @@ void CModuleScanBus::StateMachine(const uint64_t time_us)
 
     case esSMemory1:
         data8 = 2;
-        ret = WriteAllSlavesMemoryInTurn(time_us, 0x120, 1, &data8);
+        ret = WriteAllSlavesMemoryAtOnce(time_us, 0x120, 1, &data8);
         ChangeState(ret, esSMemory2, esError);
         break;
 
     case esSMemory2:
         data8 = 4;
-        ret = WriteAllSlavesMemoryInTurn(time_us, 0x120, 1, &data8);
+        ret = WriteAllSlavesMemoryAtOnce(time_us, 0x120, 1, &data8);
         ChangeState(ret, esSMemory3, esError);
         break;
 
     case esSMemory3:
         data8 = 8;
-        ret = WriteAllSlavesMemoryInTurn(time_us, 0x120, 1, &data8);
+        ret = WriteAllSlavesMemoryAtOnce(time_us, 0x120, 1, &data8);
         ChangeState(ret, esSEeprom, esError);
         eeprom_address = 0;
         break;
@@ -117,14 +117,14 @@ void CModuleScanBus::StateMachine(const uint64_t time_us)
         break;
 
     case esSPrint:
-        cout << "Slave count: " << slaves.GetSize() << endl;
-        for(int i = 0; i < slaves.GetSize(); i ++)
+        cout << "Slave count: " << slaves.size() << endl;
+        for(int i = 0; i < slaves.size(); i ++)
             cout << "Slave" << i << ": " << slaves[i].GetQWord(0) << endl;
         ChangeState(esZero);
         break;
 
     case esError:
-        slaves.Clear();
+        slaves.clear();
         ChangeState(esSPrint);
         break;
 
@@ -143,7 +143,7 @@ int CModuleScanBus::ReadSlavesEeprom(const uint64_t time_us)
         uint8_t data[5];
         data[0] = 0x01; // read
         memcpy(data + 1, &eeprom_address, 4);
-        ret = WriteAllSlavesMemoryInTurn(time_us, 0x503, 5, data);
+        ret = WriteAllSlavesMemoryAtOnce(time_us, 0x503, 5, data);
         if(ret > 0) {
             state_count = 1;
             state_subcount = 0;
@@ -151,7 +151,7 @@ int CModuleScanBus::ReadSlavesEeprom(const uint64_t time_us)
         }
     }
     else if(state_count == 1) { // read dword
-        ret = ReadAllSlavesMemoryInTurn(time_us, 0x508, 4);
+        ret = ReadAllSlavesMemoryAtOnce(time_us, 0x508, 4);
         if(ret > 0) {
             //copy here
             ++eeprom_address;

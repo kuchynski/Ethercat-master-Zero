@@ -18,6 +18,7 @@ using namespace std;
 struct SDatagramParam
 {
     unsigned int priority;
+    bool temporary;
 
     uint8_t command;
     uint8_t index;
@@ -29,11 +30,11 @@ class CDatagram
 {
 public:
     CDatagram(const uint8_t set_index);    // tx datagram
-    CDatagram(struct SDatagramParam &param);    // tx datagram
+    CDatagram(const struct SDatagramParam &param, const bool set_temporary);    // tx datagram
     CDatagram(unsigned char *buf, int size_buffer); // rx datagram
     ~CDatagram() {};
 
-    void SetParam(struct SDatagramParam &param);
+    void SetParam(const struct SDatagramParam &param);
     unsigned int SetIntoBuffer(unsigned char *out_buf, bool more_datargam);
 
     unsigned int GetPriority() const { return priority; }
@@ -42,9 +43,11 @@ public:
     uint32_t GetAddress() const { return address; }
     void GetData(unsigned char *out_buffer) const;
     void SetData(const unsigned char *in_buffer);
+    bool IsTemporary() const { return temporary; }
 
 private:
     unsigned int priority;
+    bool temporary;
 
     uint8_t command;
     uint8_t index;

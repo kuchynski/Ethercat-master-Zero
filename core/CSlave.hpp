@@ -16,7 +16,7 @@ using namespace std;
 
 #define MAX_DATAGRAM_PRIORITY   4
 #define SLAVE_MEMORY_SIZE       0xA00
-#define SLAVE_EEPROM_SIZE       0x20
+#define SLAVE_EEPROM_SIZE       0x100
 
 struct SSlaveMemory
 {

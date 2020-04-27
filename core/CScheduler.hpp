@@ -7,6 +7,7 @@
 #ifndef cscheduler_H
 #define cscheduler_H
 
+#include <vector>
 #include "CFrame.hpp"
 #include "CNetworkAdapter.hpp"
 #include "CTimer.hpp"
@@ -29,11 +30,11 @@ private:
     CTimer *timer;
     CNetworkAdapter *adapter;
     CFrame frames[MAX_DATAGRAM_PRIORITY];
-    CStack <CModule*> modules;
+    vector<CModule*> modules;
     unsigned char module_index;
 
     void SendDatagramBack(CFrame &frame);
-    CModule* GetModuleWithIndex(unsigned char index);
+    CModule* GetModuleWithIndex(const unsigned char index);
 };
 
 #endif

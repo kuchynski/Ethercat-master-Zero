@@ -5,6 +5,7 @@ INCLUDE_DIRS =	-I./core \
 SRC_FILES = ./main.cpp \
 			./core/CScheduler.cpp \
 			./core/CSlave.cpp \
+			./core/CBus.cpp \
 			./core/CDatagram.cpp \
 			./core/CFrame.cpp \
 			./core/CModule.cpp \

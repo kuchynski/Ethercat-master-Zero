@@ -44,7 +44,7 @@ CFrame::CFrame(unsigned char *recieve_buf, int recieve_size)
                 bool more_datagram = datagram_buf[7] & 0x80;
                 CDatagram *datagram = new CDatagram(datagram_buf, datagram_size);
 
-                p_datagrams << datagram;
+                datagrams.push_back(datagram);
 
                 if(!more_datagram)
                     break;
@@ -66,14 +66,14 @@ CFrame& CFrame::operator=(const CFrame &fr)
 {
     Clear();
 
-    p_datagrams = fr.p_datagrams;    
+    datagrams = fr.datagrams;    
     return *this;
 }
 
 //---------------------------------------------------------------------------
 CFrame& CFrame::operator<<(CDatagram *p_new_datagram)
 {
-    p_datagrams << p_new_datagram;    
+    datagrams.push_back(p_new_datagram);
     return *this;
 }
 
@@ -81,7 +81,12 @@ CFrame& CFrame::operator<<(CDatagram *p_new_datagram)
 CFrame& CFrame::operator>>(CDatagram **p_new_datagram)
 {
     //cout << "f0 " << p_new_datagram << endl;
-    p_datagrams >> *p_new_datagram;
+    if(datagrams.size()) {
+        *p_new_datagram = *datagrams.begin();
+        datagrams.pop_front();
+    }
+    else
+        *p_new_datagram = NULL;
 //cout << "f1 " << p_new_datagram << endl;
     return *this;
 }
@@ -95,7 +100,11 @@ CFrame::~CFrame()
 //---------------------------------------------
 void CFrame::Clear()
 {
-    p_datagrams.Clear();
+    for(list<CDatagram*>::iterator p_datagram = datagrams.begin(); p_datagram != datagrams.end(); p_datagram ++) {
+        if((*p_datagram)->IsTemporary())
+            delete *p_datagram;
+    }
+    datagrams.clear();
 }
 
 //---------------------------------------------
@@ -104,10 +113,10 @@ unsigned int CFrame::Send(CNetworkAdapter *adapter)
     unsigned char *buffer = adapter->GetBufferToSend();
     unsigned int size = 0;
 
-    if(buffer && p_datagrams.GetSize()) {
+    if(buffer && datagrams.size()) {
         size = Gather(buffer);
         adapter->Send(buffer, size);
-        p_datagrams.Clear();
+        Clear();
     }
 
     return size;
@@ -118,10 +127,11 @@ unsigned int CFrame::Gather(unsigned char *buffer)
 {
     unsigned int size = 0;
     unsigned char *buffer_datargams = buffer + ETHERNET_HEADER_SIZE + ETHERCAT_HEADER_SIZE;
+    list<CDatagram*>::iterator last_datagram = datagrams.end();
+    last_datagram --;
 
-    for(int i = 0, last_i = p_datagrams.GetSize() - 1; i <= last_i; i ++) {
-//        cout << " " << more_datagram << endl;
-        size += p_datagrams[i]->SetIntoBuffer(buffer_datargams + size, i < last_i);
+    for(list<CDatagram*>::iterator p_datagram = datagrams.begin(); p_datagram != datagrams.end(); p_datagram ++) {
+        size += (*p_datagram)->SetIntoBuffer(buffer_datargams + size, p_datagram != last_datagram);
     }
 
     memset(buffer, 0, 12);

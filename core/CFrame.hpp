@@ -8,8 +8,8 @@
 #define cframe_H	
 
 #include <cstdint>
+#include <list>
 #include "CDatagram.hpp"
-#include "CStack.hpp"
 #include "CNetworkAdapter.hpp"
 
 #define MAX_FRAME_SIZE          1514
@@ -30,7 +30,7 @@ public:
     void Clear();
 
 private:
-    CStack <CDatagram*> p_datagrams;
+    list<CDatagram*> datagrams;
 
     unsigned int Gather(unsigned char *buffer);
 };

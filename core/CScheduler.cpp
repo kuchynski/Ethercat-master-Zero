@@ -24,15 +24,15 @@ CScheduler::~CScheduler()
 //---------------------------------------------
 void CScheduler::Run()
 {
-    int count = 10000;
+    int count = 1000000;
     unsigned char recieve_buf[MAX_FRAME_SIZE];
     uint64_t current_cycle_time = timer->GetTimeUs();
 
     while(count --) 
     {        
         // Work
-        for(int i = 0; i < modules.GetSize(); i ++) {
-            modules[i]->RunTx(this, current_cycle_time);
+        for(vector<CModule*>::iterator p_module = modules.begin(); p_module != modules.end(); p_module ++) {
+            (*p_module)->RunTx(this, current_cycle_time);
         }
 
         // Wait
@@ -57,7 +57,7 @@ void CScheduler::Run()
 //---------------------------------------------
 void CScheduler::AddModule(CModule *new_module)
 {
-    modules << new_module;
+    modules.push_back(new_module);
 }
 
 //---------------------------------------------
@@ -77,8 +77,7 @@ void CScheduler::SendDatagramBack(CFrame &frame)
             CModule *module = GetModuleWithIndex(datagram->GetIndex());
             if(module)
                 module->RunRx(datagram); // Send back to the owner
-            else
-                delete datagram; // The owner hasn't been found
+            delete datagram;
         }
         else
             break;
@@ -86,11 +85,11 @@ void CScheduler::SendDatagramBack(CFrame &frame)
 }
 
 //---------------------------------------------
-CModule* CScheduler::GetModuleWithIndex(unsigned char index)
+CModule* CScheduler::GetModuleWithIndex(const unsigned char index)
 {
-    for(int i = 0; i < modules.GetSize(); i++) {
-        if(modules[i]->GetIndex() == index)
-            return modules[i];
+    for(vector<CModule*>::iterator p_module = modules.begin(); p_module != modules.end(); p_module ++) {
+        if((*p_module)->GetIndex() == index)
+            return *p_module;
     }
     return NULL;
 }

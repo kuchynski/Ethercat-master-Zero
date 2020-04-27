@@ -17,7 +17,7 @@ using namespace std;
 int main(void)
 {
     CLinuxNetworkAdapter adapter("enp7s0");
-    CLinuxTimer timer(1000);
+    CLinuxTimer timer(25);
     CScheduler scheduler(&timer, &adapter);
     CModuleScanBus module0(scheduler.GetNewModuleIndex());
     //CModuleScanBus module1(&scheduler);

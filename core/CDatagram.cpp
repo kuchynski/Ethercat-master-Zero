@@ -22,7 +22,9 @@ using namespace std;
 #define OFFSET_DATA     10
 
 //---------------------------------------------
-CDatagram::CDatagram(const uint8_t set_index) : index(set_index) // tx datagram
+CDatagram::CDatagram(const uint8_t set_index) :  // tx datagram
+    index(set_index),
+    temporary(false)
 {
     struct SDatagramParam param;
     param.index = index;
@@ -34,14 +36,16 @@ CDatagram::CDatagram(const uint8_t set_index) : index(set_index) // tx datagram
 }
 
 //---------------------------------------------
-CDatagram::CDatagram(struct SDatagramParam &param) // tx datagram
+CDatagram::CDatagram(const struct SDatagramParam &param, const bool set_temporary = true) : // tx datagram
+    index(param.index),
+    temporary(set_temporary)
 {
-    index = param.index;
     SetParam(param);
 }
 
 //---------------------------------------------
-CDatagram::CDatagram(unsigned char *buf, int size_buffer) // rx datagram
+CDatagram::CDatagram(unsigned char *buf, int size_buffer) :  // rx datagram
+    temporary(false)
 {    
     command = buf[OFFSET_CMD];
     index = buf[OFFSET_IDX];
@@ -55,11 +59,13 @@ CDatagram::CDatagram(unsigned char *buf, int size_buffer) // rx datagram
 }
 
 //---------------------------------------------
-void CDatagram::SetParam(struct SDatagramParam &param)
+void CDatagram::SetParam(const struct SDatagramParam &param)
 {
     command = param.command;
     address = param.address;
     size_data = param.size_data;
+    priority = param.priority;
+//    temporary = param.temporary;
 }
 
 //---------------------------------------------
