@@ -1,3 +1,3 @@
 # Ethercat-master-Zero
-Ethercat master
+Ethercat master.
 It is just a concept!
